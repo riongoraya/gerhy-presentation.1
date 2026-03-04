@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Frank Gehry — Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root {
+  --a:#e8e0d0; /* accent — overridden per slide */
+  --ad:rgba(232,224,208,0.15);
+  --ink:#0d0d0d;
+  --cream:#f5f0e8;
+}
+
+html,body { width:100%;height:100%;overflow:hidden;background:var(--ink);font-family:'Space Mono',monospace;cursor:none; }
+
+/* ══ CURSOR ══ */
+#cur {
+  position:fixed;width:12px;height:12px;border-radius:50%;
+  background:var(--a);pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:background .4s,width .2s,height .2s,opacity .2s;
+  mix-blend-mode:difference;
+}
+#cur.big{width:36px;height:36px;opacity:.35}
+
+/* ══ INTRO ══ */
+#intro {
+  position:fixed;inset:0;z-index:900;
+  background:linear-gradient(135deg,#0d0d0d 0%,#1a0a2e 50%,#0d1a2e 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;
+  overflow:hidden;
+}
+#intro::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 80% 60% at 50% 50%,rgba(120,60,200,.18),transparent 70%);
+  pointer-events:none;
+}
+/* animated grain */
+#intro::after {
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  opacity:.4;pointer-events:none;
+}
+#intro-bg-rings {
+  position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;
+}
+.ibr { position:absolute;border-radius:50%;border:1px solid rgba(160,100,255,.15);animation:ibrspin linear infinite; }
+.ibr1{width:70vmin;height:70vmin;animation-duration:25s}
+.ibr2{width:50vmin;height:50vmin;animation-duration:18s;animation-direction:reverse}
+.ibr3{width:30vmin;height:30vmin;animation-duration:12s}
+@keyframes ibrspin{to{transform:rotate(360deg)}}
+
+#intro-title {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(4rem,13vw,12rem);font-weight:900;
+  line-height:.88;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:.05em;
+  position:relative;z-index:1;
+}
+#intro-title .w { overflow:hidden;display:block; }
+#intro-title .w span { display:block;transform:translateY(105%);animation:wordUp .95s cubic-bezier(.16,1,.3,1) both; }
+#intro-title .w1 span { animation-delay:.1s;color:#fff; }
+#intro-title .w2 span { animation-delay:.3s;color:rgba(160,100,255,.7);font-style:italic; }
+
+#intro-rule { width:0;height:1px;background:rgba(255,255,255,.2);animation:ruleGrow .8s .6s cubic-bezier(.22,1,.36,1) both;position:relative;z-index:1; }
+#intro-sub  { font-size:.62rem;letter-spacing:.42em;color:rgba(255,255,255,.4);text-transform:uppercase;opacity:0;animation:fadeIn .6s .85s both ease;position:relative;z-index:1; }
+
+#intro-bar { position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.06);overflow:hidden; }
+#intro-bar::after { content:'';display:block;height:100%;background:linear-gradient(90deg,#7c3aed,#a78bfa);width:0;animation:barFill 2.6s .2s cubic-bezier(.4,0,.15,1) both; }
+
+#intro.exit { animation:introOut .7s cubic-bezier(.85,0,.15,1) both; }
+
+@keyframes wordUp   { to{transform:translateY(0)} }
+@keyframes ruleGrow { to{width:clamp(14rem,32vw,28rem)} }
+@keyframes barFill  { to{width:100%} }
+@keyframes introOut { 0%{clip-path:inset(0 0 0 0)} 100%{clip-path:inset(0 0 100% 0)} }
+
+/* ══ CURTAIN ══ */
+#curtain { position:fixed;inset:0;z-index:600;pointer-events:none;display:grid;grid-template-columns:repeat(6,1fr); }
+.cs { transform:scaleY(0);transform-origin:top;will-change:transform; }
+#curtain.cl .cs { animation:csIn .38s cubic-bezier(.85,0,.15,1) both; }
+#curtain.op .cs { animation:csOut .44s cubic-bezier(.85,0,.15,1) both;transform-origin:bottom; }
+.cs:nth-child(1){animation-delay:0s}.cs:nth-child(2){animation-delay:.03s}.cs:nth-child(3){animation-delay:.06s}
+.cs:nth-child(4){animation-delay:.09s}.cs:nth-child(5){animation-delay:.12s}.cs:nth-child(6){animation-delay:.15s}
+@keyframes csIn  {from{transform:scaleY(0)}to{transform:scaleY(1)}}
+@keyframes csOut {from{transform:scaleY(1)}to{transform:scaleY(0)}}
+
+/* ══ UI CHROME ══ */
+#abar { position:fixed;top:0;left:0;height:3px;width:100%;background:var(--a);z-index:700;transform:scaleX(0);transform-origin:left;transition:background .5s; }
+#abar.show { animation:abarIn .55s .5s cubic-bezier(.22,1,.36,1) both; }
+@keyframes abarIn{to{transform:scaleX(1)}}
+
+#progress { position:fixed;top:3px;left:0;height:2px;background:rgba(255,255,255,.15);transition:width .5s;z-index:698; }
+
+/* ══ SCROLL WHEEL NAV ══ */
+#scrollwheel {
+  position:fixed;left:1.6rem;top:50%;transform:translateY(-50%);
+  z-index:800;display:flex;flex-direction:column;align-items:center;gap:.55rem;
+  opacity:0;transition:opacity .4s;
+}
+#scrollwheel.on { opacity:1; }
+#sw-up, #sw-down {
+  background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.55);width:2rem;height:2rem;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:background .2s,color .2s,border-color .2s;
+  flex-shrink:0;
+}
+#sw-up:hover,#sw-down:hover {
+  background:rgba(255,255,255,.14);color:#fff;border-color:var(--a);
+}
+#sw-track {
+  width:2px;height:9rem;background:rgba(255,255,255,.1);
+  border-radius:2px;position:relative;overflow:visible;
+}
+#sw-pip-wrap { position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;align-items:center;padding:4px 0; }
+.sw-pip { width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,.18);transition:background .3s,transform .3s; }
+.sw-pip.active { background:var(--a);transform:scale(1.4); }
+#sw-thumb {
+  position:absolute;left:50%;transform:translateX(-50%);
+  width:10px;height:10px;border-radius:50%;
+  background:var(--a);box-shadow:0 0 8px var(--a);
+  transition:top .45s cubic-bezier(.22,1,.36,1),background .4s,box-shadow .4s;
+  top:0;
+}
+#slide-counter {
+  color:rgba(255,255,255,.35);font-size:.48rem;letter-spacing:.1em;
+  font-family:'Space Mono',monospace;text-align:center;margin-top:.2rem;
+}
+#khint{position:fixed;top:1.4rem;right:2rem;font-size:.48rem;color:rgba(255,255,255,.25);letter-spacing:.2em;text-transform:uppercase;z-index:800;pointer-events:none;opacity:0;transition:opacity .4s}
+#khint.on{opacity:1}
+
+/* ══════════════════════════════════════
+   S_DES — DESIGNS & PRODUCTS  (warm terracotta/gold on dark)
+══════════════════════════════════════ */
+#sdes {
+  background:linear-gradient(135deg,#120a00 0%,#1e1000 55%,#0d0d08 100%);
+  flex-direction:column;padding:2.6vw 5vw;overflow:hidden;
+}
+#sdes::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#d97706,#f59e0b,transparent)}
+#sdes .dhead{display:flex;justify-content:space-between;align-items:flex-start;flex:0 0 auto;margin-bottom:1.4rem}
+#sdes .dhead h3{font-size:.56rem;letter-spacing:.32em;color:#f59e0b;text-transform:uppercase;margin-bottom:.5rem}
+#sdes .dhead h2{font-family:'Playfair Display',serif;font-size:clamp(1.6rem,3.4vw,2.8rem);font-weight:900;color:#fff;line-height:1;letter-spacing:-.02em}
+#sdes .dsub{font-size:.56rem;color:rgba(255,210,130,.45);letter-spacing:.12em;text-align:right;line-height:2}
+#sdes .dgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;flex:1;min-height:0}
+.dcard{background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.18);padding:1rem 1.1rem;display:flex;flex-direction:column;position:relative;overflow:hidden;border-top:2px solid #d97706}
+.dcard .dcat{font-size:.44rem;letter-spacing:.28em;color:#f59e0b;text-transform:uppercase;margin-bottom:.55rem}
+.dcard h4{font-family:'Playfair Display',serif;font-size:.82rem;color:#fef3c7;margin-bottom:.55rem;font-style:italic;line-height:1.2}
+.dcard .dmeta{font-size:.5rem;color:rgba(254,243,199,.4);letter-spacing:.08em;margin-bottom:.6rem}
+.dcard p{font-size:.58rem;color:rgba(255,225,160,.65);line-height:1.78;flex:1}
+.dcard .dyr{position:absolute;bottom:.65rem;right:.85rem;font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:900;color:rgba(245,158,11,.08);line-height:1}
+#sdes .drow2{display:grid;grid-template-columns:repeat(4,1fr);gap:.85rem;flex:0 0 auto}
+
+/* ══ SLIDES ══ */
+#pres{width:100vw;height:100vh;position:relative;overflow:hidden}
+.slide{position:absolute;inset:0;width:100%;height:100%;display:flex;opacity:0;pointer-events:none}
+.slide.on{opacity:1;pointer-events:all}
+
+/* ══ ANIMATIONS ══ */
+@keyframes fadeIn  {from{opacity:0}to{opacity:1}}
+@keyframes fadeUp  {from{opacity:0;transform:translateY(32px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideL  {from{opacity:0;transform:translateX(-52px)}to{opacity:1;transform:translateX(0)}}
+@keyframes slideR  {from{opacity:0;transform:translateX(52px)}to{opacity:1;transform:translateX(0)}}
+@keyframes scaleIn {from{opacity:0;transform:scale(.88)}to{opacity:1;transform:scale(1)}}
+@keyframes revealU {from{clip-path:inset(100% 0 0 0)}to{clip-path:inset(0% 0 0 0)}}
+@keyframes revealL {from{clip-path:inset(0 100% 0 0)}to{clip-path:inset(0 0% 0 0)}}
+@keyframes growH   {from{transform:scaleX(0);transform-origin:left}to{transform:scaleX(1);transform-origin:left}}
+@keyframes spin    {to{transform:rotate(360deg)}}
+@keyframes pulse   {0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.07);opacity:.9}}
+@keyframes blink   {0%,100%{opacity:1}50%{opacity:.15}}
+@keyframes float   {0%,100%{transform:translateY(0)}50%{transform:translateY(-14px)}}
+
+.slide [data-a]{opacity:0}
+.slide.rev [data-a]{animation-fill-mode:both;animation-timing-function:cubic-bezier(.22,1,.36,1);animation-duration:.82s}
+.slide.rev [data-a="fadeIn"]  {animation-name:fadeIn}
+.slide.rev [data-a="fadeUp"]  {animation-name:fadeUp}
+.slide.rev [data-a="fadeDown"]{animation-name:fadeDown}
+.slide.rev [data-a="slideL"]  {animation-name:slideL}
+.slide.rev [data-a="slideR"]  {animation-name:slideR}
+.slide.rev [data-a="scaleIn"] {animation-name:scaleIn}
+.slide.rev [data-a="revealU"] {animation-name:revealU}
+.slide.rev [data-a="revealL"] {animation-name:revealL}
+.slide.rev [data-a="growH"]   {animation-name:growH}
+
+/* ══════════════════════════════════════
+   S1 — TITLE  (deep violet / indigo)
+══════════════════════════════════════ */
+#s1 {
+  background:linear-gradient(135deg,#0f0722 0%,#1e0a4a 45%,#0a1628 100%);
+  flex-direction:column;justify-content:center;align-items:flex-start;
+  padding:5vw 8vw;overflow:hidden;
+}
+#s1::before {
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 65% 75% at 78% 50%,rgba(124,58,237,.22),transparent 65%);
+  pointer-events:none;
+}
+.s1-orb {
+  position:absolute;right:10vw;top:50%;border-radius:50%;
+  border:1px solid rgba(167,139,250,.1);transform:translateY(-50%);
+  animation:spin linear infinite;
+}
+.s1-orb::after {
+  content:'';position:absolute;border-radius:50%;
+  background:#a78bfa;top:-4px;left:50%;transform:translateX(-50%);
+  box-shadow:0 0 18px rgba(167,139,250,.8);
+}
+.ob1{width:min(54vw,54vh);height:min(54vw,54vh);animation-duration:34s}
+.ob1::after{width:6px;height:6px}
+.ob2{width:min(38vw,38vh);height:min(38vw,38vh);animation-duration:22s;animation-direction:reverse}
+.ob2::after{width:4px;height:4px;top:auto;bottom:-3px;opacity:.55}
+.ob3{width:min(22vw,22vh);height:min(22vw,22vh);animation-duration:14s}
+.ob3::after{width:3px;height:3px;opacity:.35}
+
+#s1 .ghost{position:absolute;right:-.05em;bottom:-.22em;font-family:'Playfair Display',serif;font-size:52vw;font-weight:900;color:rgba(167,139,250,.06);line-height:1;pointer-events:none;letter-spacing:-.05em;animation:pulse 9s ease-in-out infinite}
+#s1 .s1tag{font-size:clamp(.48rem,.82vw,.72rem);color:#a78bfa;letter-spacing:.38em;text-transform:uppercase;margin-bottom:1.8rem}
+#s1 .s1bar{width:0;height:2px;background:linear-gradient(90deg,#7c3aed,#a78bfa);margin-bottom:1.8rem}
+#s1 .s1name{font-family:'Playfair Display',serif;font-size:clamp(3.5rem,10vw,9rem);font-weight:900;color:#fff;line-height:.9;letter-spacing:-.03em}
+#s1 .s1name em{display:block;font-style:italic;color:rgba(167,139,250,.6)}
+#s1 .s1tag2{margin-top:2.2rem;font-size:clamp(.7rem,1.1vw,.9rem);color:rgba(200,190,220,.7);max-width:38ch;line-height:1.82}
+#s1 .s1foot{position:absolute;bottom:3rem;left:8vw;display:flex;align-items:center;gap:1.4rem}
+#s1 .s1foot span{font-size:.54rem;letter-spacing:.25em;color:rgba(167,139,250,.5);text-transform:uppercase}
+#s1 .s1foot::after{content:'';display:block;width:4rem;height:1px;background:rgba(167,139,250,.3)}
+#s1 .s1hint{position:absolute;bottom:3rem;right:8vw;font-size:.46rem;color:rgba(167,139,250,.4);letter-spacing:.22em;text-transform:uppercase;animation:blink 2.8s 2s infinite}
+
+/* ══════════════════════════════════════
+   S2 — BIOGRAPHY  (deep teal + amber)
+══════════════════════════════════════ */
+#s2{flex-direction:column;overflow:hidden;background:#f0ebe0}
+#s2 .s2top {
+  background:linear-gradient(135deg,#003d40 0%,#005f5f 60%,#00474a 100%);
+  padding:3vw 6vw 2.6vw;position:relative;overflow:hidden;flex:0 0 auto;
+}
+#s2 .s2top::before{content:'';position:absolute;left:0;top:0;bottom:0;width:5px;background:linear-gradient(180deg,#f59e0b,#fbbf24)}
+#s2 .s2top .ghost-yr{position:absolute;right:-.05em;top:-.15em;font-family:'Playfair Display',serif;font-size:22vw;font-weight:900;color:rgba(251,191,36,.07);line-height:1;pointer-events:none}
+#s2 .s2top .s2tag{font-size:.58rem;letter-spacing:.32em;color:#fbbf24;text-transform:uppercase;margin-bottom:.7rem}
+#s2 .s2top h2{font-family:'Playfair Display',serif;font-size:clamp(2.4rem,6vw,5rem);font-weight:900;color:#fff;line-height:.95;letter-spacing:-.03em}
+#s2 .s2top h2 em{font-style:italic;color:rgba(251,191,36,.7)}
+#s2 .s2bot{display:grid;grid-template-columns:1fr 1fr;flex:1;min-height:0}
+#s2 .s2bio{display:flex;flex-direction:column;justify-content:center;padding:3vw 5vw;background:#f0ebe0;border-right:2px solid rgba(0,63,64,.1)}
+#s2 .s2bio p{font-family:'Playfair Display',serif;font-size:clamp(.88rem,1.3vw,1.08rem);color:#1a1a1a;line-height:1.85;margin-bottom:1.1rem}
+#s2 .s2bio p:last-child{margin-bottom:0}
+#s2 .s2bio .vonote{font-family:'Space Mono',monospace;font-size:.54rem;color:#666;border-left:3px solid #f59e0b;padding-left:.9rem;line-height:1.78;background:rgba(245,158,11,.06);padding:.6rem .9rem;border-radius:0 4px 4px 0}
+#s2 .s2stats{background:linear-gradient(180deg,#003d40 0%,#001f20 100%);display:flex;flex-direction:column;justify-content:center;padding:3vw 4.5vw}
+#s2 .s2stats .st{display:flex;gap:1rem;align-items:baseline;border-top:1px solid rgba(251,191,36,.12);padding:.88rem 0}
+#s2 .s2stats .st:last-child{border-bottom:1px solid rgba(251,191,36,.12)}
+#s2 .s2stats .st .k{font-size:.5rem;color:rgba(251,191,36,.55);letter-spacing:.15em;text-transform:uppercase;min-width:7rem;flex-shrink:0}
+#s2 .s2stats .st .v{font-size:clamp(.8rem,1.15vw,.95rem);color:#fef3c7;font-family:'Playfair Display',serif;font-style:italic}
+
+/* ══════════════════════════════════════
+   S3 — GUGGENHEIM  (rust / terracotta)
+══════════════════════════════════════ */
+#s3 {
+  background:linear-gradient(135deg,#1a0800 0%,#2d0f00 50%,#1a1000 100%);
+  flex-direction:column;padding:3.5vw 5.5vw;overflow:hidden;
+}
+#s3::before{content:'';position:absolute;top:0;right:0;width:50%;height:4px;background:linear-gradient(to left,#e55a2b,transparent)}
+#s3::after{content:'';position:absolute;bottom:-20%;left:-10%;width:60%;height:70%;background:radial-gradient(ellipse,rgba(229,90,43,.12),transparent 70%);border-radius:50%;pointer-events:none}
+#s3 .dhead{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.8rem;flex:0 0 auto}
+#s3 .dhead .lt h3{font-size:.57rem;letter-spacing:.3em;color:#e55a2b;text-transform:uppercase;margin-bottom:.55rem}
+#s3 .dhead .lt h2{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3.7vw,3rem);color:#fff;font-weight:900;letter-spacing:-.02em;line-height:1}
+#s3 .dhead .rt .meta{font-size:.56rem;color:rgba(255,200,150,.5);letter-spacing:.1em;line-height:2.2;text-align:right}
+#s3 .grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1.1rem;flex:1;min-height:0}
+#s3 .imgb{position:relative;overflow:hidden}
+#s3 .imgb img{width:100%;height:100%;object-fit:cover;filter:sepia(40%) saturate(1.2) contrast(1.05);transition:filter .6s,transform .6s;display:block}
+#s3 .imgb:hover img{filter:sepia(10%) saturate(1.3) contrast(1.05);transform:scale(1.04)}
+#s3 .imgb::after{content:'';position:absolute;top:0;left:0;width:4px;height:100%;background:linear-gradient(180deg,#e55a2b,#c84515)}
+#s3 .imgb .ilabel{position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.72);padding:.45rem .85rem;font-size:.5rem;color:rgba(255,200,150,.6);letter-spacing:.1em}
+.s3card{background:rgba(255,255,255,.04);border:1px solid rgba(229,90,43,.2);padding:1.3rem;display:flex;flex-direction:column;position:relative;overflow:hidden;border-top:2px solid #e55a2b}
+.s3card .ctag{font-size:.48rem;letter-spacing:.25em;color:#e55a2b;text-transform:uppercase;margin-bottom:.65rem}
+.s3card h4{font-family:'Playfair Display',serif;font-size:.92rem;color:#ffe8d6;margin-bottom:.7rem;font-style:italic}
+.s3card p{font-size:.64rem;color:rgba(255,220,190,.7);line-height:1.82;flex:1}
+.s3sub{border:1px solid rgba(229,90,43,.15);padding:.85rem;background:rgba(229,90,43,.06)}
+.s3sub .ctag{font-size:.45rem;letter-spacing:.22em;color:#e55a2b;text-transform:uppercase;margin-bottom:.45rem}
+.s3sub p{font-size:.62rem;color:rgba(255,220,190,.65);line-height:1.78}
+
+/* ══════════════════════════════════════
+   S4 — DISNEY HALL  (cobalt blue + gold)
+══════════════════════════════════════ */
+#s4{display:flex;flex-direction:column;background:#e8f0f8;position:relative;overflow:hidden}
+#s4 .s4bg{position:absolute;inset:0;z-index:0}
+#s4 .s4bg img{width:100%;height:100%;object-fit:cover;filter:saturate(1.1) contrast(1.05) brightness(.55);display:block}
+#s4 .s4bg::after{content:'';position:absolute;inset:0;background:linear-gradient(120deg,rgba(8,20,60,.82) 0%,rgba(8,20,60,.6) 50%,rgba(8,20,60,.3) 100%)}
+#s4::after{content:'';position:absolute;bottom:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1d4ed8,#3b82f6);z-index:2}
+#s4 .txside{display:flex;flex-direction:column;justify-content:center;padding:4vw 7vw;position:relative;z-index:1;flex:1}
+#s4 .txside .s4tag{font-size:.56rem;letter-spacing:.3em;color:#93c5fd;text-transform:uppercase;margin-bottom:.85rem}
+#s4 .txside h2{font-family:'Playfair Display',serif;font-size:clamp(1.5rem,2.9vw,2.6rem);font-weight:900;color:#fff;line-height:1.05;letter-spacing:-.02em;margin-bottom:.45rem}
+#s4 .txside .loc{font-size:.57rem;color:rgba(147,197,253,.6);letter-spacing:.1em;margin-bottom:1.6rem}
+#s4 .cg{display:flex;flex-direction:row;gap:.9rem}
+.s4card{background:rgba(255,255,255,.08);border:none;padding:.95rem 1.1rem;display:flex;flex-direction:column;border-left:4px solid #3b82f6;flex:1;backdrop-filter:blur(8px)}
+.s4card .ctag{font-size:.46rem;letter-spacing:.24em;color:#93c5fd;text-transform:uppercase;margin-bottom:.5rem}
+.s4card h4{font-family:'Playfair Display',serif;font-size:.85rem;color:#fff;margin-bottom:.45rem;font-style:italic}
+.s4card p{font-size:.63rem;color:rgba(220,235,255,.75);line-height:1.8}
+
+/* ══════════════════════════════════════
+   S5 — RESPONSIBILITIES  (forest green)
+══════════════════════════════════════ */
+#s5 {
+  background:linear-gradient(150deg,#021207 0%,#0a2412 50%,#051a0a 100%);
+  flex-direction:column;justify-content:center;padding:4.5vw 7vw;overflow:hidden;
+}
+#s5::before{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(52,211,153,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(52,211,153,.04) 1px,transparent 1px);background-size:50px 50px;pointer-events:none}
+#s5::after{content:'';position:absolute;top:-15%;right:-10%;width:55%;height:65%;background:radial-gradient(ellipse,rgba(52,211,153,.1),transparent 70%);border-radius:50%;pointer-events:none}
+#s5 .s5tag{font-size:.56rem;letter-spacing:.3em;color:#34d399;text-transform:uppercase;margin-bottom:1.1rem}
+#s5 h2{font-family:'Playfair Display',serif;font-size:clamp(1.9rem,4.2vw,3.5rem);font-weight:900;color:#fff;line-height:1;letter-spacing:-.03em;margin-bottom:2.2rem}
+#s5 h2 em{color:rgba(52,211,153,.5);font-style:italic}
+#s5 .rg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.3rem}
+.ri{border-top:1px solid rgba(52,211,153,.15);padding-top:1.1rem;transition:border-color .3s}
+.ri:hover{border-top-color:#34d399}
+.ri .rn{font-size:.5rem;color:rgba(52,211,153,.5);letter-spacing:.2em;margin-bottom:.5rem}
+.ri h4{font-family:'Playfair Display',serif;font-size:.95rem;color:#ecfdf5;font-style:italic;margin-bottom:.5rem}
+.ri p{font-size:.63rem;color:rgba(209,250,229,.6);line-height:1.8}
+
+/* ══════════════════════════════════════
+   S6 — TECHNOLOGY  (slate blue split)
+══════════════════════════════════════ */
+#s6{display:grid;grid-template-columns:1fr 1fr}
+#s6 .tp:first-child{background:linear-gradient(160deg,#0c1445 0%,#1e2d6e 100%)}
+#s6 .tp:last-child {background:linear-gradient(160deg,#1a0633 0%,#3b0764 100%)}
+#s6 .tp{display:flex;flex-direction:column;justify-content:center;padding:5vw;position:relative;overflow:hidden}
+#s6 .tp .bgn{position:absolute;bottom:-.2em;right:-.05em;font-family:'Playfair Display',serif;font-size:16rem;font-weight:900;color:rgba(255,255,255,.05);pointer-events:none;line-height:1}
+#s6 .tp::after{content:'';position:absolute;top:0;left:0;right:0;height:4px}
+#s6 .tp:first-child::after{background:linear-gradient(90deg,#60a5fa,#3b82f6)}
+#s6 .tp:last-child::after {background:linear-gradient(90deg,#c084fc,#a855f7)}
+#s6 .tp:first-child::before{content:'';position:absolute;bottom:-20%;right:-20%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(96,165,250,.1),transparent 70%);border-radius:50%;pointer-events:none}
+#s6 .tp:last-child::before {content:'';position:absolute;top:-20%;left:-20%;width:60%;height:60%;background:radial-gradient(ellipse,rgba(192,132,252,.1),transparent 70%);border-radius:50%;pointer-events:none}
+#s6 .s6stag{font-size:.5rem;letter-spacing:.3em;color:rgba(255,255,255,.35);text-transform:uppercase;margin-bottom:.8rem}
+#s6 .tp:first-child .s6ttag{font-size:.48rem;letter-spacing:.15em;border:1px solid rgba(96,165,250,.5);padding:.22rem .55rem;color:#60a5fa;text-transform:uppercase;margin-bottom:.9rem;display:inline-block}
+#s6 .tp:last-child  .s6ttag{font-size:.48rem;letter-spacing:.15em;border:1px solid rgba(192,132,252,.5);padding:.22rem .55rem;color:#c084fc;text-transform:uppercase;margin-bottom:.9rem;display:inline-block}
+#s6 .tp h3{font-family:'Playfair Display',serif;font-size:clamp(1.4rem,2.7vw,2.2rem);font-weight:900;color:#fff;letter-spacing:-.02em;line-height:1.1;margin-bottom:1.1rem}
+#s6 .tp p{font-size:.7rem;color:rgba(220,230,255,.65);line-height:1.85}
+#s6 .tp:first-child .imp{margin-top:1.3rem;border-left:3px solid #60a5fa;padding-left:1rem}
+#s6 .tp:last-child  .imp{margin-top:1.3rem;border-left:3px solid #c084fc;padding-left:1rem}
+#s6 .tp .imp .k{font-size:.48rem;letter-spacing:.2em;color:rgba(255,255,255,.3);text-transform:uppercase;margin-bottom:.28rem}
+#s6 .tp .imp p{font-size:.66rem;color:rgba(210,220,255,.6)}
+
+/* ══════════════════════════════════════
+   S7 — BIBLIOGRAPHY  (deep charcoal + gold)
+══════════════════════════════════════ */
+#s7 {
+  background:linear-gradient(150deg,#1a1200 0%,#2d1f00 50%,#1a1000 100%);
+  flex-direction:column;justify-content:center;padding:5vw 8vw;overflow:hidden;
+}
+#s7::before{content:'';position:absolute;top:0;left:0;width:40%;height:4px;background:linear-gradient(90deg,#f59e0b,transparent)}
+#s7::after{content:'';position:absolute;bottom:-20%;right:-15%;width:55%;height:65%;background:radial-gradient(ellipse,rgba(245,158,11,.1),transparent 70%);border-radius:50%;pointer-events:none}
+#s7 .s7tag{font-size:.57rem;letter-spacing:.3em;color:#f59e0b;text-transform:uppercase;margin-bottom:1.2rem}
+#s7 h2{font-family:'Playfair Display',serif;font-size:clamp(1.7rem,3.6vw,2.8rem);font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:2rem}
+#s7 .bl{display:flex;flex-direction:column;gap:0;max-width:82ch}
+#s7 .bi{border-top:1px solid rgba(245,158,11,.12);padding:.7rem 0;font-size:.64rem;color:rgba(254,243,199,.65);line-height:1.72;transition:color .3s}
+#s7 .bi:hover{color:#fef3c7}
+#s7 .bi em{color:rgba(251,191,36,.55);font-style:italic}
+
+/* ══════════════════════════════════════
+   S8 — END  (magenta / rose)
+══════════════════════════════════════ */
+#s8 {
+  background:linear-gradient(135deg,#1a0010 0%,#2d0020 45%,#0d000d 100%);
+  flex-direction:column;justify-content:center;align-items:center;overflow:hidden;text-align:center;
+}
+#s8::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 70% 60% at 50% 50%,rgba(236,72,153,.15),transparent 65%);pointer-events:none}
+.ering{position:absolute;border-radius:50%;border:1px solid rgba(236,72,153,.12);animation:pulse 4.5s ease-in-out infinite}
+.er1{width:28vmin;height:28vmin;animation-delay:0s}
+.er2{width:50vmin;height:50vmin;animation-delay:1s}
+.er3{width:72vmin;height:72vmin;animation-delay:2s}
+#s8 .edot{position:absolute;width:8px;height:8px;background:#f472b6;border-radius:50%;box-shadow:0 0 30px rgba(244,114,182,.8);animation:pulse 3s ease-in-out infinite}
+#s8 .ghost{position:absolute;font-family:'Playfair Display',serif;font-size:28vw;font-weight:900;color:rgba(236,72,153,.07);letter-spacing:-.05em;pointer-events:none;user-select:none}
+#s8 h1{font-family:'Playfair Display',serif;font-size:clamp(3rem,7vw,6rem);font-weight:900;color:#fff;letter-spacing:-.04em;line-height:.9;position:relative;z-index:1}
+#s8 h1 em{display:block;font-style:italic;color:rgba(244,114,182,.7)}
+#s8 .earule{width:0;height:2px;background:linear-gradient(90deg,#f472b6,#ec4899);margin:1.4rem auto 0}
+#s8 .sub{margin-top:1.6rem;font-size:.62rem;color:rgba(251,207,232,.4);letter-spacing:.28em;text-transform:uppercase;position:relative;z-index:1}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+
+<!-- ── INTRO ── -->
+<div id="intro">
+  <div id="intro-bg-rings">
+    <div class="ibr ibr1"></div>
+    <div class="ibr ibr2"></div>
+    <div class="ibr ibr3"></div>
+  </div>
+  <div id="intro-title">
+    <div class="w w1"><span>Frank</span></div>
+    <div class="w w2"><span>Gehry</span></div>
+  </div>
+  <div id="intro-rule"></div>
+  <div id="intro-sub">Architecture Design &nbsp;·&nbsp; 1929 – Present</div>
+  <div id="intro-bar"></div>
+</div>
+
+<!-- ── CURTAIN ── -->
+<div id="curtain">
+  <div class="cs"></div><div class="cs"></div><div class="cs"></div>
+  <div class="cs"></div><div class="cs"></div><div class="cs"></div>
+</div>
+
+<div id="abar"></div>
+<div id="progress"></div>
+<div id="khint">← → or click to navigate</div>
+
+<div id="pres">
+
+  <!-- S1: TITLE -->
+  <div class="slide" id="s1">
+    <div class="s1-orb ob1"></div>
+    <div class="s1-orb ob2"></div>
+    <div class="s1-orb ob3"></div>
+    <div class="ghost"  data-a="scaleIn" style="animation-duration:1.5s;animation-delay:0s">G</div>
+    <div class="s1tag"  data-a="fadeDown" style="animation-delay:.05s">Architecture Design Presentation</div>
+    <div class="s1bar"  data-a="growH"   style="animation-delay:.2s;animation-duration:.65s"></div>
+    <div class="s1name" data-a="revealU"  style="animation-delay:.26s;animation-duration:.95s">
+      Frank<br><em>Gehry</em>
+    </div>
+    <div class="s1tag2" data-a="fadeUp"  style="animation-delay:.56s">
+      Deconstructivist visionary who shattered<br>the boundaries of built form.
+    </div>
+    <div class="s1foot" data-a="fadeUp"  style="animation-delay:.74s">
+      <span>B. 1929 · Toronto, Canada</span>
+    </div>
+    <div class="s1hint" data-a="fadeIn"  style="animation-delay:1.2s">Press → to begin</div>
+    <div data-a="scaleIn" style="animation-delay:.4s;position:absolute;right:8vw;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;align-items:center;gap:1rem">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Frank_Gehry%27s_portrait.jpg/440px-Frank_Gehry%27s_portrait.jpg"
+           alt="Frank Gehry"
+           style="width:clamp(11rem,18vw,20rem);height:clamp(14rem,23vw,26rem);object-fit:cover;object-position:top center;border:3px solid rgba(167,139,250,.35);box-shadow:0 0 60px rgba(124,58,237,.25),0 0 0 1px rgba(167,139,250,.1);filter:grayscale(20%) contrast(1.05)">
+      <div style="font-size:.46rem;letter-spacing:.25em;color:rgba(167,139,250,.5);text-transform:uppercase;text-align:center">Frank O. Gehry · b. 1929</div>
+    </div>
+  </div>
+
+  <!-- S2: BIOGRAPHY -->
+  <div class="slide" id="s2">
+    <div class="s2top">
+      <div class="ghost-yr" data-a="fadeIn"  style="animation-duration:1.4s;animation-delay:0s">29</div>
+      <div class="s2tag"    data-a="slideL"  style="animation-delay:.06s">01 — Biography</div>
+      <h2 data-a="revealU" style="animation-delay:.2s;animation-duration:.9s">Frank <em>Gehry</em> — The Man Behind the Curves</h2>
+    </div>
+    <div class="s2bot">
+      <div class="s2bio">
+        <p data-a="fadeUp" style="animation-delay:.32s">Frank Owen Goldberg was born in Toronto, Canada in 1929, moving to Los Angeles in 1947 and later adopting the surname Gehry. He earned his architecture degree from the University of Southern California before continuing at Harvard's Graduate School of Design.</p>
+        <p data-a="fadeUp" style="animation-delay:.47s">After working for several firms he founded his own practice in 1962. Over six decades Gehry became one of the world's most celebrated architects — his sculptural buildings challenge every convention of built form and have transformed entire cities.</p>
+        <p class="vonote" data-a="fadeUp" style="animation-delay:.62s">🎙 VOICEOVER (20 sec): "Frank Gehry, born in Toronto in 1929, studied at USC and Harvard before founding his firm in LA. Over six decades he revolutionised architecture with rule-breaking sculptural designs — earning the Pritzker Prize in 1989."</p>
+      </div>
+      <div class="s2stats">
+        <div data-a="scaleIn" style="animation-delay:.2s;display:flex;justify-content:center;padding:1.5rem 0 .5rem">
+          <div style="position:relative">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Frank_Gehry%27s_portrait.jpg/440px-Frank_Gehry%27s_portrait.jpg"
+                 alt="Frank Gehry portrait"
+                 style="width:7rem;height:7rem;object-fit:cover;object-position:top;border-radius:50%;border:2px solid rgba(251,191,36,.4);filter:grayscale(15%) contrast(1.05);display:block">
+            <div style="position:absolute;bottom:-.2rem;right:-.2rem;width:1.4rem;height:1.4rem;background:#f59e0b;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.5rem;font-weight:700;color:#000">✦</div>
+          </div>
+        </div>
+        <div class="st" data-a="slideR" style="animation-delay:.34s"><span class="k">Born</span><span class="v">Feb 28, 1929 · Toronto</span></div>
+        <div class="st" data-a="slideR" style="animation-delay:.43s"><span class="k">Education</span><span class="v">USC · Harvard GSD</span></div>
+        <div class="st" data-a="slideR" style="animation-delay:.52s"><span class="k">Award</span><span class="v">Pritzker Prize, 1989</span></div>
+        <div class="st" data-a="slideR" style="animation-delay:.61s"><span class="k">Practice</span><span class="v">Gehry Partners, LLP</span></div>
+        <div class="st" data-a="slideR" style="animation-delay:.70s"><span class="k">Nationality</span><span class="v">American (naturalised)</span></div>
+        <div class="st" data-a="slideR" style="animation-delay:.79s"><span class="k">Known For</span><span class="v">Deconstructivism · CATIA</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S3: GUGGENHEIM -->
+  <div class="slide" id="s3">
+    <div class="dhead" data-a="fadeUp" style="animation-delay:.05s">
+      <div class="lt"><h3>02 — Design Example 01</h3><h2>Guggenheim Museum Bilbao</h2></div>
+      <div class="rt"><div class="meta">Location: Bilbao, Spain<br>Completed: 1997<br>Materials: Titanium · Limestone · Glass</div></div>
+    </div>
+    <div class="grid">
+      <div class="imgb" data-a="revealL" style="animation-delay:.2s;animation-duration:1.05s">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Guggenheim_Bilbao_Ove_Arup.jpg/1280px-Guggenheim_Bilbao_Ove_Arup.jpg" alt="Guggenheim Bilbao">
+        <div class="ilabel">Guggenheim Museum Bilbao, 1997 — Frank Gehry</div>
+      </div>
+      <div class="s3card" data-a="fadeUp" style="animation-delay:.38s">
+        <div class="ctag">Target Market</div>
+        <h4>Art lovers, tourists &amp; urban planners</h4>
+        <p>Designed for international art audiences, cultural tourists, and city governments seeking a transformative landmark. It hosts world-class contemporary exhibitions and is among the most visited museums globally.</p>
+      </div>
+      <div class="s3card" data-a="fadeUp" style="animation-delay:.52s;display:flex;flex-direction:column;gap:.8rem;padding:0;background:transparent;border:none">
+        <div class="s3sub">
+          <div class="ctag">Preferred Futures</div>
+          <p>Gehry pioneered CATIA aerospace software for architecture, enabling impossible curved forms. This became the foundation of parametric digital design — transforming how all complex buildings are built today.</p>
+        </div>
+        <div class="s3sub">
+          <div class="ctag">Ethical Design</div>
+          <p>The 'Bilbao Effect' — the museum revived a post-industrial city, boosting employment and civic pride. Cultural investment as ethical urban regeneration became a globally adopted model.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S4: DISNEY HALL -->
+  <div class="slide" id="s4">
+    <div class="s4bg">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Walt_Disney_Concert_Hall_by_Carol_Highsmith_edit-2.jpg/1280px-Walt_Disney_Concert_Hall_by_Carol_Highsmith_edit-2.jpg" alt="Walt Disney Concert Hall">
+    </div>
+    <div class="txside">
+      <div class="s4tag"  data-a="fadeDown" style="animation-delay:.22s">02 — Design Example 02</div>
+      <h2 data-a="revealU" style="animation-delay:.36s;animation-duration:.88s">Walt Disney<br>Concert Hall</h2>
+      <div class="loc" data-a="fadeUp" style="animation-delay:.5s">Los Angeles, CA · Completed 2003 · Stainless Steel</div>
+      <div data-a="fadeUp" style="animation-delay:.54s;display:flex;align-items:center;gap:.85rem;margin-bottom:1.2rem;padding:.7rem;background:rgba(29,78,216,.18);border-left:3px solid #3b82f6;max-width:28rem">
+        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Frank_Gehry%27s_portrait.jpg/440px-Frank_Gehry%27s_portrait.jpg" alt="Frank Gehry" style="width:3.4rem;height:3.4rem;object-fit:cover;object-position:top;border-radius:50%;border:2px solid #3b82f6;flex-shrink:0">
+        <div>
+          <div style="font-size:.44rem;letter-spacing:.22em;color:#93c5fd;text-transform:uppercase;margin-bottom:.2rem">Architect</div>
+          <div style="font-family:'Playfair Display',serif;font-size:.82rem;color:#fff;font-style:italic">Frank O. Gehry</div>
+          <div style="font-size:.5rem;color:rgba(147,197,253,.7);margin-top:.18rem">b. 1929 · Pritzker Prize 1989</div>
+        </div>
+      </div>
+      <div class="cg">
+        <div class="s4card" data-a="fadeUp" style="animation-delay:.6s">
+          <div class="ctag">Target Market</div>
+          <h4>Music patrons &amp; the LA community</h4>
+          <p>Home of the LA Philharmonic; serves classical lovers, students and the community through free public programming and open garden spaces accessible to everyone.</p>
+        </div>
+        <div class="s4card" data-a="fadeUp" style="animation-delay:.74s">
+          <div class="ctag">Preferred Futures</div>
+          <h4>Acoustic perfection + recyclable steel</h4>
+          <p>Fully recyclable stainless steel panels and world-class acoustics prove sustainability and cultural excellence aren't mutually exclusive — a benchmark for future cultural buildings.</p>
+        </div>
+        <div class="s4card" data-a="fadeUp" style="animation-delay:.88s">
+          <div class="ctag">Ethical Design</div>
+          <h4>Social inclusion by design</h4>
+          <p>Free public gardens wrap the building, ensuring the hall serves the whole city — not just ticket holders. Gehry deliberately designed for social access and civic belonging.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S5: RESPONSIBILITIES -->
+  <div class="slide" id="s5">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Frank_Gehry_-_Parc_des_Ateliers.jpg/640px-Frank_Gehry_-_Parc_des_Ateliers.jpg"
+         alt="Frank Gehry at Parc des Ateliers"
+         data-a="fadeIn" style="animation-delay:.05s;position:absolute;top:0;right:0;width:26%;height:100%;object-fit:cover;object-position:top center;opacity:.18;pointer-events:none;filter:grayscale(30%)">
+    <div data-a="fadeUp" style="animation-delay:.05s;position:absolute;top:2rem;right:0;width:26%;text-align:center;padding-top:.5rem">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/Frank_Gehry_-_Parc_des_Ateliers.jpg/640px-Frank_Gehry_-_Parc_des_Ateliers.jpg"
+           alt="Frank Gehry"
+           style="width:5.5rem;height:5.5rem;object-fit:cover;object-position:top center;border-radius:50%;border:2px solid rgba(52,211,153,.4);filter:grayscale(10%)">
+      <div style="font-size:.42rem;letter-spacing:.15em;color:rgba(52,211,153,.5);text-transform:uppercase;margin-top:.5rem">Frank Gehry</div>
+    </div>
+    <div class="s5tag"  data-a="fadeDown" style="animation-delay:.05s">03 — Responsibilities &amp; Influencing Factors</div>
+    <h2 data-a="revealU" style="animation-delay:.18s;animation-duration:.9s">What shapes<br><em>his decisions?</em></h2>
+    <div class="rg">
+      <div class="ri" data-a="fadeUp" style="animation-delay:.3s"><div class="rn">01 — Ethical</div><h4>Social Responsibility</h4><p>Gehry consistently considers the social impact of his buildings — designing public spaces that benefit entire communities. Both Bilbao and Disney Hall include free public access zones.</p></div>
+      <div class="ri" data-a="fadeUp" style="animation-delay:.42s"><div class="rn">02 — Environmental</div><h4>Material Choices</h4><p>His use of titanium and recyclable stainless steel reflects a commitment to longevity and sustainability. Buildings designed to last centuries minimise long-term environmental footprint.</p></div>
+      <div class="ri" data-a="fadeUp" style="animation-delay:.54s"><div class="rn">03 — Client Needs</div><h4>Listening First</h4><p>Gehry works closely with clients — from city governments to cultural institutions. Disney Hall took 16 years, reflecting deep consultation and commitment to realising the client's vision.</p></div>
+      <div class="ri" data-a="fadeUp" style="animation-delay:.66s"><div class="rn">04 — Technology</div><h4>Digital Precision</h4><p>CATIA software bridges artistic vision and structural engineering — enabling him to model curves impossible to realise through any conventional method.</p></div>
+      <div class="ri" data-a="fadeUp" style="animation-delay:.78s"><div class="rn">05 — Legal &amp; Safety</div><h4>Code Compliance</h4><p>Despite radical forms, every Gehry building meets strict structural safety standards. Engineering partners ensure each curve is as sound as it is visually striking.</p></div>
+      <div class="ri" data-a="fadeUp" style="animation-delay:.9s"><div class="rn">06 — Budget</div><h4>Managing Constraints</h4><p>Gehry navigates large public budgets under political scrutiny. Disney Hall's budget was revised multiple times without compromising artistic integrity.</p></div>
+    </div>
+  </div>
+
+  <!-- S6: TECHNOLOGY -->
+  <div class="slide" id="s6">
+    <div class="tp" data-a="slideL" style="animation-delay:.08s;animation-duration:1s">
+      <div class="bgn">1</div>
+      <div class="s6stag">04 — Technology &amp; Innovation</div>
+      <div class="s6ttag" data-a="fadeIn" style="animation-delay:.35s">Past → Current</div>
+      <h3 data-a="revealU" style="animation-delay:.46s;animation-duration:.82s">CATIA Software</h3>
+      <p data-a="fadeUp" style="animation-delay:.6s">Originally built for aerospace, Gehry's team adapted CATIA in the 1990s to design the Guggenheim Bilbao. For the first time, architects could model buildings with complex double-curved surfaces impossible to draw by hand.</p>
+      <div class="imp" data-a="fadeUp" style="animation-delay:.76s">
+        <div class="k">Impact on Society &amp; Environment</div>
+        <p>CATIA democratised radical architecture globally — reducing material waste through precise fabrication, cutting costs by up to 40% on complex forms, enabling sustainable design at scale.</p>
+      </div>
+    </div>
+    <div class="tp" data-a="slideR" style="animation-delay:.25s;animation-duration:1s">
+      <div class="bgn">2</div>
+      <div class="s6stag">04 — Technology &amp; Innovation</div>
+      <div class="s6ttag" data-a="fadeIn" style="animation-delay:.5s">Current → Emerging</div>
+      <h3 data-a="revealU" style="animation-delay:.62s;animation-duration:.82s">Gehry Technologies &amp; BIM</h3>
+      <p data-a="fadeUp" style="animation-delay:.76s">Gehry co-founded Gehry Technologies, developing Digital Project — a Building Information Modelling platform allowing construction teams to collaborate on a single 3D model in real time, adopted by major firms worldwide.</p>
+      <div class="imp" data-a="fadeUp" style="animation-delay:.92s">
+        <div class="k">Impact on Society &amp; Environment</div>
+        <p>BIM reduced construction errors, minimised material waste, and shortened project timelines — making buildings safer, cheaper, and less damaging to the environment globally.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- S_DES: DESIGNS & PRODUCTS -->
+  <div class="slide" id="sdes">
+    <div class="dhead" data-a="fadeUp" style="animation-delay:.05s">
+      <div>
+        <h3>05 — Designs, Buildings &amp; Products</h3>
+        <h2>A Legacy<br><em>in Form</em></h2>
+      </div>
+      <div class="dsub">Architecture · Furniture · Urban Design<br>1962 – Present · 50+ Major Works</div>
+    </div>
+    <div class="dgrid">
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.18s">
+        <div class="dcat">Landmark Building</div>
+        <h4>Guggenheim Museum Bilbao</h4>
+        <div class="dmeta">Bilbao, Spain · 1997</div>
+        <p>His most iconic work — titanium-clad curves revived a post-industrial city and defined contemporary museum architecture globally.</p>
+        <div class="dyr">97</div>
+      </div>
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.28s">
+        <div class="dcat">Concert Hall</div>
+        <h4>Walt Disney Concert Hall</h4>
+        <div class="dmeta">Los Angeles, CA · 2003</div>
+        <p>Stainless steel sails house one of the world's finest concert acoustics, home of the LA Philharmonic.</p>
+        <div class="dyr">03</div>
+      </div>
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.38s">
+        <div class="dcat">Museum</div>
+        <h4>Louis Vuitton Foundation</h4>
+        <div class="dmeta">Paris, France · 2014</div>
+        <p>Glass "sails" and white fibreglass structures create a billowing form in the Bois de Boulogne — housing contemporary art for LVMH.</p>
+        <div class="dyr">14</div>
+      </div>
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.48s">
+        <div class="dcat">Cultural Centre</div>
+        <h4>Experience Music Project</h4>
+        <div class="dmeta">Seattle, WA · 2000</div>
+        <p>A riot of multicoloured steel forms inspired by shattered electric guitars, housing music history and pop culture exhibitions.</p>
+        <div class="dyr">00</div>
+      </div>
+    </div>
+    <div class="drow2" style="margin-top:.85rem">
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.58s">
+        <div class="dcat">University Building</div>
+        <h4>Ray &amp; Maria Stata Center</h4>
+        <div class="dmeta">MIT, Cambridge, MA · 2004</div>
+        <p>Tumbling towers of brick, steel and brushed aluminium house MIT's Computer Science and AI Laboratory.</p>
+        <div class="dyr">04</div>
+      </div>
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.66s">
+        <div class="dcat">Office Tower</div>
+        <h4>IAC Building</h4>
+        <div class="dmeta">New York City · 2007</div>
+        <p>New York's first all-glass building, its billowing white curtain-wall facade resembles sails on the Hudson.</p>
+        <div class="dyr">07</div>
+      </div>
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.74s">
+        <div class="dcat">Furniture Design</div>
+        <h4>Easy Edges &amp; Wiggle Chair</h4>
+        <div class="dmeta">Knoll / Vitra · 1972–1992</div>
+        <p>Laminated corrugated cardboard furniture — surprisingly strong and sculptural. The Wiggle Chair remains a design icon sold by Vitra today.</p>
+        <div class="dyr">72</div>
+      </div>
+      <div class="dcard" data-a="fadeUp" style="animation-delay:.82s">
+        <div class="dcat">Jewellery &amp; Product</div>
+        <h4>Tiffany &amp; Co. Jewellery</h4>
+        <div class="dmeta">Tiffany &amp; Co. · 2006–Present</div>
+        <p>Biomorphic gold and silver pieces — torque bangles, fish earrings, coral necklaces — applying his sculptural language to wearable design.</p>
+        <div class="dyr">06</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- S7: BIBLIOGRAPHY -->
+  <div class="slide" id="s7">
+    <div class="s7tag"  data-a="fadeDown" style="animation-delay:.06s">05 — APA Bibliography</div>
+    <h2 data-a="revealU" style="animation-delay:.18s;animation-duration:.88s">References</h2>
+    <div class="bl">
+      <div class="bi" data-a="fadeUp" style="animation-delay:.3s">Arnell, P., &amp; Bickford, T. (Eds.). (1985). <em>Frank Gehry: Buildings and projects.</em> Rizzoli.</div>
+      <div class="bi" data-a="fadeUp" style="animation-delay:.4s">Dal Co, F., &amp; Forster, K. W. (1998). <em>Frank O. Gehry: The complete works.</em> The Monacelli Press.</div>
+      <div class="bi" data-a="fadeUp" style="animation-delay:.5s">Gehry, F. (2004). <em>Gehry talks: Architecture + process.</em> Universe Publishing.</div>
+      <div class="bi" data-a="fadeUp" style="animation-delay:.6s">Guggenheim Museum Bilbao. (2023). <em>About the museum.</em> https://www.guggenheim-bilbao.eus/en/the-building</div>
+      <div class="bi" data-a="fadeUp" style="animation-delay:.7s">LA Phil. (2023). <em>Walt Disney Concert Hall.</em> https://www.laphil.com/visit/walt-disney-concert-hall</div>
+      <div class="bi" data-a="fadeUp" style="animation-delay:.8s">Pritzker Architecture Prize. (1989). <em>Frank O. Gehry: Laureate biography.</em> https://www.pritzkerprize.com/laureates/1989</div>
+      <div class="bi" data-a="fadeUp" style="animation-delay:.9s">Sorkin, M. (1991). Frank Gehry: The forms of the ordinary. <em>Exquisite Corpse: Writing on Buildings,</em> 225–239. Verso.</div>
+    </div>
+  </div>
+
+  <!-- S8: END -->
+  <div class="slide" id="s8">
+    <div class="ering er1"></div>
+    <div class="ering er2"></div>
+    <div class="ering er3"></div>
+    <div class="edot"></div>
+    <div class="ghost" data-a="scaleIn" style="animation-duration:1.5s;animation-delay:0s">FG</div>
+    <h1 data-a="revealU" style="animation-delay:.26s;animation-duration:.92s">Architecture<br><em>as sculpture.</em></h1>
+    <div class="earule" data-a="growH"  style="animation-delay:.58s;animation-duration:.72s"></div>
+    <div class="sub"    data-a="fadeUp" style="animation-delay:.75s">Frank Gehry &nbsp;·&nbsp; 1929 – Present &nbsp;·&nbsp; Pritzker Prize 1989</div>
+  </div>
+
+</div>
+
+<div id="ticker-wrap">
+  <div id="ticker-label">BREAKING</div>
+  <div id="ticker-track">
+    <div id="ticker-inner">
+      <span>Guggenheim Museum Bilbao celebrates 27 years as a global icon of deconstructivist architecture &nbsp;·&nbsp;</span>
+      <span>Frank Gehry's Louis Vuitton Foundation named among the world's most visited art museums &nbsp;·&nbsp;</span>
+      <span>Walt Disney Concert Hall ranked #1 acoustic venue in North America by Classical Music Review &nbsp;·&nbsp;</span>
+      <span>Gehry Partners announces new cultural centre commission in Abu Dhabi &nbsp;·&nbsp;</span>
+      <span>Frank Gehry, aged 95, receives lifetime achievement award from the American Institute of Architects &nbsp;·&nbsp;</span>
+      <span>Wiggle Chair by Frank Gehry re-released in limited edition by Vitra to mark 50th anniversary &nbsp;·&nbsp;</span>
+      <span>MIT Stata Center wins structural engineering excellence award for its radical load-bearing geometry &nbsp;·&nbsp;</span>
+      <span>Tiffany &amp; Co. Gehry jewellery collection sells out within hours of online launch &nbsp;·&nbsp;</span>
+      <span>Gehry Technologies' Digital Project BIM platform adopted by 300+ firms across 40 countries &nbsp;·&nbsp;</span>
+      <span>The 'Bilbao Effect' continues to inspire city governments worldwide to invest in landmark architecture &nbsp;·&nbsp;</span>
+    </div>
+    <div id="ticker-inner" aria-hidden="true">
+      <span>Guggenheim Museum Bilbao celebrates 27 years as a global icon of deconstructivist architecture &nbsp;·&nbsp;</span>
+      <span>Frank Gehry's Louis Vuitton Foundation named among the world's most visited art museums &nbsp;·&nbsp;</span>
+      <span>Walt Disney Concert Hall ranked #1 acoustic venue in North America by Classical Music Review &nbsp;·&nbsp;</span>
+      <span>Gehry Partners announces new cultural centre commission in Abu Dhabi &nbsp;·&nbsp;</span>
+      <span>Frank Gehry, aged 95, receives lifetime achievement award from the American Institute of Architects &nbsp;·&nbsp;</span>
+      <span>Wiggle Chair by Frank Gehry re-released in limited edition by Vitra to mark 50th anniversary &nbsp;·&nbsp;</span>
+      <span>MIT Stata Center wins structural engineering excellence award for its radical load-bearing geometry &nbsp;·&nbsp;</span>
+      <span>Tiffany &amp; Co. Gehry jewellery collection sells out within hours of online launch &nbsp;·&nbsp;</span>
+      <span>Gehry Technologies' Digital Project BIM platform adopted by 300+ firms across 40 countries &nbsp;·&nbsp;</span>
+      <span>The 'Bilbao Effect' continues to inspire city governments worldwide to invest in landmark architecture &nbsp;·&nbsp;</span>
+    </div>
+  </div>
+</div>
+
+<style>
+#ticker-wrap {
+  position:fixed;bottom:0;left:0;right:0;z-index:750;
+  display:flex;align-items:center;height:2.2rem;
+  background:rgba(6,6,10,.92);border-top:1px solid rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);overflow:hidden;
+}
+#ticker-label {
+  flex-shrink:0;padding:0 1rem;height:100%;
+  display:flex;align-items:center;
+  background:var(--a);color:#000;
+  font-size:.52rem;font-weight:700;letter-spacing:.22em;
+  font-family:'Space Mono',monospace;text-transform:uppercase;
+  transition:background .5s;
+}
+#ticker-track {
+  flex:1;overflow:hidden;display:flex;align-items:center;height:100%;
+}
+#ticker-inner {
+  display:inline-flex;align-items:center;white-space:nowrap;
+  font-family:'Space Mono',monospace;font-size:.54rem;
+  color:rgba(255,255,255,.7);letter-spacing:.06em;
+  animation:tickerScroll 55s linear infinite;
+}
+#ticker-inner span { padding:0 .5rem; }
+@keyframes tickerScroll {
+  0%   { transform:translateX(0); }
+  100% { transform:translateX(-100%); }
+}
+#ticker-wrap:hover #ticker-inner { animation-play-state:paused; }
+</style>
+
+<div id="scrollwheel">
+  <button id="sw-up" onclick="prev()" title="Previous slide">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,10 7,4 12,10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <div id="sw-track">
+    <div id="sw-pip-wrap"></div>
+    <div id="sw-thumb"></div>
+  </div>
+  <button id="sw-down" onclick="next()" title="Next slide">
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><polyline points="2,4 7,10 12,4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+  <span id="slide-counter">1 / 9</span>
+</div>
+
+<script>
+/* Slide accent colours + curtain colours */
+const SLIDES = [
+  { a:'#a78bfa', curtain:'#1e0a4a' }, // 1 violet
+  { a:'#fbbf24', curtain:'#003d40' }, // 2 amber/teal
+  { a:'#e55a2b', curtain:'#2d0f00' }, // 3 rust
+  { a:'#3b82f6', curtain:'#0d1f4a' }, // 4 cobalt
+  { a:'#34d399', curtain:'#021207' }, // 5 emerald
+  { a:'#60a5fa', curtain:'#0c1445' }, // 6 blue/violet
+  { a:'#f59e0b', curtain:'#1e1000' }, // 7 gold (designs)
+  { a:'#f59e0b', curtain:'#2d1f00' }, // 8 gold (bibliography)
+  { a:'#f472b6', curtain:'#2d0020' }, // 9 rose
+];
+
+const cur = document.getElementById('cur');
+const curtain = document.getElementById('curtain');
+const slides = Array.from(document.querySelectorAll('.slide'));
+const N = slides.length;
+let ci = 0, busy = false;
+
+/* Cursor */
+document.addEventListener('mousemove', e => {
+  cur.style.left = e.clientX + 'px';
+  cur.style.top  = e.clientY + 'px';
+});
+document.querySelectorAll('button').forEach(b => {
+  b.addEventListener('mouseenter', () => cur.classList.add('big'));
+  b.addEventListener('mouseleave', () => cur.classList.remove('big'));
+});
+
+/* Accent */
+function setAccent(i) {
+  const s = SLIDES[i];
+  document.documentElement.style.setProperty('--a', s.a);
+  cur.style.background = s.a;
+}
+
+/* Curtain */
+function runCurtain(close, col, cb) {
+  curtain.querySelectorAll('.cs').forEach(s => s.style.background = col);
+  curtain.classList.remove('cl','op');
+  void curtain.offsetWidth;
+  curtain.classList.add(close ? 'cl' : 'op');
+  setTimeout(cb, close ? 535 : 580);
+}
+
+/* Reveal */
+function reveal(el) {
+  el.classList.remove('rev');
+  void el.offsetWidth;
+  setTimeout(() => el.classList.add('rev'), 80);
+}
+
+/* Transition */
+function goTo(n) {
+  if (busy) return;
+  const t = ((n % N) + N) % N;
+  if (t === ci) return;
+  busy = true;
+
+  runCurtain(true, SLIDES[ci].curtain, () => {
+    slides[ci].classList.remove('on','rev');
+    ci = t;
+    slides[ci].classList.add('on');
+    setAccent(ci);
+    updateUI();
+
+    runCurtain(false, SLIDES[ci].curtain, () => {
+      reveal(slides[ci]);
+      busy = false;
+    });
+  });
+}
+
+function next() { goTo(ci + 1); }
+function prev() { goTo(ci - 1); }
+
+function updateUI() {
+  document.getElementById('slide-counter').textContent = (ci+1)+' / '+N;
+  document.getElementById('progress').style.width = ((ci+1)/N*100)+'%';
+  const ab = document.getElementById('abar');
+  ab.classList.remove('show'); void ab.offsetWidth; ab.classList.add('show');
+  updateWheel(ci);
+  // update thumb colour
+  swThumb.style.background = SLIDES[ci].a;
+  swThumb.style.boxShadow = '0 0 8px ' + SLIDES[ci].a;
+}
+
+/* Scroll Wheel */
+const swTrack = document.getElementById('sw-track');
+const swThumb = document.getElementById('sw-thumb');
+const swPipWrap = document.getElementById('sw-pip-wrap');
+
+function buildPips() {
+  swPipWrap.innerHTML = '';
+  for (let i = 0; i < N; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'sw-pip' + (i === 0 ? ' active' : '');
+    pip.addEventListener('click', () => goTo(i));
+    pip.style.cursor = 'pointer';
+    swPipWrap.appendChild(pip);
+  }
+}
+buildPips();
+
+function updateWheel(i) {
+  const pct = N > 1 ? i / (N - 1) : 0;
+  const trackH = swTrack.offsetHeight;
+  swThumb.style.top = (pct * (trackH - 10)) + 'px';
+  document.querySelectorAll('.sw-pip').forEach((p, idx) => {
+    p.classList.toggle('active', idx === i);
+  });
+}
+
+/* Drag scroll wheel */
+let dragging = false, dragStartY = 0, dragStartIdx = 0;
+swThumb.addEventListener('mousedown', e => {
+  dragging = true; dragStartY = e.clientY; dragStartIdx = ci;
+  e.preventDefault();
+});
+document.addEventListener('mousemove', e => {
+  if (!dragging) return;
+  const trackH = swTrack.offsetHeight - 10;
+  const delta = e.clientY - dragStartY;
+  const steps = Math.round(delta / (trackH / (N - 1)));
+  const target = Math.max(0, Math.min(N - 1, dragStartIdx + steps));
+  if (target !== ci) goTo(target);
+});
+document.addEventListener('mouseup', () => { dragging = false; });
+
+/* Mouse wheel on the scroll widget */
+document.getElementById('scrollwheel').addEventListener('wheel', e => {
+  e.preventDefault();
+  if (e.deltaY > 0) next(); else prev();
+}, { passive: false });
+
+/* Init + Intro */
+setAccent(0);
+document.getElementById('progress').style.width = (1/N*100)+'%';
+
+setTimeout(() => {
+  const intro = document.getElementById('intro');
+  intro.classList.add('exit');
+  setTimeout(() => {
+    intro.style.display = 'none';
+    slides[0].classList.add('on');
+    setAccent(0);
+    reveal(slides[0]);
+    document.getElementById('scrollwheel').classList.add('on');
+    document.getElementById('khint').classList.add('on');
+    updateUI();
+    updateWheel(0);
+  }, 720);
+}, 3000);
+
+/* Input */
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+  if (e.key === 'ArrowLeft')                    { e.preventDefault(); prev(); }
+});
+document.getElementById('pres').addEventListener('click', next);
+</script>
+</body>
+</html>
