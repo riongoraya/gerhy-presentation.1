@@ -1,4 +1,5 @@
-# gehry-presentation.html
+# Frank Gehry Presentation Project
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
